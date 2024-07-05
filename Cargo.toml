@@ -10,5 +10,6 @@ serde_json = { version = "1", features = ["preserve_order"] }
 json_utils_2024 = "0.4"
 dotenvy = "0.15"
 nodb = "0.2"
+tokio = { version = "1", features = ["full"] }
 regex = "1"
 anyhow = "1"

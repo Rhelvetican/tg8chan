@@ -7,6 +7,7 @@ use std::{fs::File, io::Write, path::Path};
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Config {
     pub owner_id: u64,
+    pub name: String,
     pub api: ApiConfig,
     pub file: FileConfig,
     pub policy: PostPolicy,
@@ -18,6 +19,7 @@ impl Config {
         dotenv()?;
         Ok(Config {
             owner_id: var("OWNER_ID")?.parse()?,
+            name: var("NAME")?,
             api: ApiConfig::load()?,
             file: FileConfig::load()?,
             policy: PostPolicy::load()?,
