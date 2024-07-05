@@ -1,12 +1,11 @@
 use anyhow::Result;
+use config::load_config;
 
 mod bot;
 mod config;
-mod db;
-mod error;
-mod log;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let config = load_config();
     Ok(())
 }
