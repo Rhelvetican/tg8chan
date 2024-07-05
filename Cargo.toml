@@ -8,3 +8,4 @@ carapax = { version = "0.20.0", features = ["full"] }
 dotenvy = "0.15"
 nodb = "0.2"
 regex = "1"
+anyhow = "1"
