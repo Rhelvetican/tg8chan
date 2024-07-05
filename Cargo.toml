@@ -1,0 +1,10 @@
+[package]
+name = "tg8chan"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+carapax = { version = "0.20.0", features = ["full"] }
+dotenvy = "0.15"
+nodb = "0.2"
+regex = "1"
