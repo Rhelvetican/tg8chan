@@ -5,6 +5,9 @@ edition = "2021"
 
 [dependencies]
 carapax = { version = "0.20.0", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+json_utils_2024 = "0.4"
 dotenvy = "0.15"
 nodb = "0.2"
 regex = "1"

@@ -1,18 +1,13 @@
-use config::{init_config, Config};
+use anyhow::Result;
+use config::load_config;
 
 mod cmd;
 mod config;
 mod db;
 mod error;
 
-fn main() {
-    let config = match Config::load() {
-        Ok(config) => config,
-        Err(_) => {
-            eprintln!("Unable to read from .env file.");
-            println!("Automatically generating a new .env file.");
-            init_config().unwrap();
-            Config::load().unwrap()
-        }
-    };
+fn main() -> Result<()> {
+    let config = load_config();
+    config.save_to_json("config.json")?;
+    Ok(())
 }

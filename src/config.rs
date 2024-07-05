@@ -1,9 +1,10 @@
-use std::{fs::File, io::Write};
-
 use anyhow::Result;
 use dotenvy::{dotenv, var};
+use jsonutils::file::{read_json, write_json};
+use serde::{Deserialize, Serialize};
+use std::{fs::File, io::Write, path::Path};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Config {
     pub owner_id: u64,
     pub api: ApiConfig,
@@ -13,7 +14,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load() -> Result<Config> {
+    pub fn load_from_dotenv() -> Result<Self> {
         dotenv()?;
         Ok(Config {
             owner_id: var("OWNER_ID")?.parse()?,
@@ -23,9 +24,15 @@ impl Config {
             media: MediaPolicy::load()?,
         })
     }
+    pub fn save_to_json<T: AsRef<Path>>(&self, path: T) -> Result<()> {
+        write_json(path, self)
+    }
+    pub fn load_from_json<T: AsRef<Path>>(path: T) -> Result<Self> {
+        read_json(path)
+    }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct ApiConfig {
     pub id: u64,
     pub secret: String,
@@ -33,7 +40,7 @@ pub struct ApiConfig {
 }
 
 impl ApiConfig {
-    pub fn load() -> Result<ApiConfig> {
+    fn load() -> Result<ApiConfig> {
         dotenv()?;
         Ok(ApiConfig {
             id: var("API_ID")?.parse()?,
@@ -43,7 +50,7 @@ impl ApiConfig {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct FileConfig {
     pub seed: u64,
     pub db: String,
@@ -63,7 +70,7 @@ impl FileConfig {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct PostPolicy {
     pub interval: u64,
     pub restrict_dislike_limit: u64,
@@ -73,7 +80,7 @@ pub struct PostPolicy {
 }
 
 impl PostPolicy {
-    pub fn load() -> Result<PostPolicy> {
+    fn load() -> Result<PostPolicy> {
         dotenv()?;
         Ok(PostPolicy {
             interval: var("POST_INTERVAL")?.parse()?,
@@ -85,13 +92,13 @@ impl PostPolicy {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct MediaPolicy {
     pub max_media_size: u64,
 }
 
 impl MediaPolicy {
-    pub fn load() -> Result<MediaPolicy> {
+    fn load() -> Result<MediaPolicy> {
         dotenv()?;
         Ok(MediaPolicy {
             max_media_size: var("MAX_MEDIA_SIZE")?.parse()?,
@@ -131,4 +138,28 @@ pub fn init_config() -> Result<()> {
     let mut config = File::create(".env")?;
     config.write_all(DEFAULT_CONFIG.as_bytes())?;
     Ok(())
+}
+
+pub fn load_config() -> Config {
+    match Config::load_from_dotenv() {
+        Ok(config) => config,
+        Err(_) => {
+            eprintln!("Failed to load config from .env file");
+            eprintln!("Trying to read from config/config.json file");
+            match Config::load_from_json("config/config.json") {
+                Ok(config) => config,
+                Err(_) => {
+                    eprintln!("Failed to load config from config/config.json file");
+                    eprintln!("Trying to create a new config file");
+                    match init_config() {
+                        Ok(_) => Config::load_from_dotenv().unwrap(),
+                        Err(e) => {
+                            eprintln!("Failed to create a new config file: {}", e);
+                            panic!("Failed to load config")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

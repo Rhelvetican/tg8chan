@@ -709,6 +709,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "json_utils_2024"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c5be86e90e271351c2ed898a34869119427e3a0fadf9010661eb7af5059af2d"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1463,8 +1474,11 @@ dependencies = [
  "anyhow",
  "carapax",
  "dotenvy",
+ "json_utils_2024",
  "nodb",
  "regex",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
